@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
-	"os"
+	"net/http"
 	"project-context-switcher/cmd"
 	"project-context-switcher/internal/db"
+
+	"github.com/go-chi/chi"
 )
 
 func main() {
@@ -16,10 +18,21 @@ func main() {
 
 	defer DB.Close()
 
+	r := chi.NewRouter()
 	rootCmd := cmd.NewRootCmd(DB)
 	rootCmd.Init()
 	if err = rootCmd.Execute(); err != nil {
 		fmt.Printf("something went wrong initializing the cli commands: %s\n", err)
-		os.Exit(1)
+		return
+	}
+
+	// Serve frontend on specific port on command: pcs web
+	// Create svelte project
+
+	staticFiles := http.FileServer(http.Dir("../frontend/dist"))
+	r.Handle("/*", staticFiles)
+	if err = http.ListenAndServe("localhost:8080", r); err != nil {
+		fmt.Printf("something went wrong starting the http listener: %s", err)
+		return
 	}
 }
