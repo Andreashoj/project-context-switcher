@@ -23,7 +23,6 @@ func NewRootCmd(db *sql.DB, router *chi.Mux) RootCmd {
 }
 
 func (r *RootCmd) Init() {
-	r.cmd.AddCommand(testCommand)
 	r.cmd.AddCommand(CreateWebCommand(r.Router))
 }
 

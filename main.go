@@ -22,6 +22,10 @@ func main() {
 	rootCmd := cmd.NewRootCmd(DB, r)
 	rootCmd.Init()
 
+	// Create some CRUD for creating projects?
+	// When I have crud for projects, they can be served to frontend
+	// Analyze projects and get data to showcase - this should enable the whole docker analyze implementation
+
 	if err = rootCmd.Execute(); err != nil {
 		fmt.Printf("something went wrong initializing the cli commands: %s\n", err)
 		return
