@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"project-context-switcher/internal/repos"
 
 	"github.com/spf13/cobra"
 )
 
-func CreateProjectCommand(projectRepo repos.ProjectRepo) (*cobra.Command, error) {
+func CreateProjectCommand(projectRepo repos.ProjectRepo) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "create",
 		Long: "create a project, use flags --path and --name to specify project details",
@@ -37,9 +38,10 @@ func CreateProjectCommand(projectRepo repos.ProjectRepo) (*cobra.Command, error)
 
 	err := cmd.MarkFlagRequired("path")
 	err = cmd.MarkFlagRequired("name")
+
 	if err != nil {
-		return nil, fmt.Errorf("missing required flags: %w", err)
+		log.Panicf("somehting went wrong! %w", err)
 	}
 
-	return cmd, nil
+	return cmd
 }

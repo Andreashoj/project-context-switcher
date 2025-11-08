@@ -33,9 +33,10 @@ func NewDB() (*sql.DB, error) {
 func runMigrations(db *sql.DB) error {
 	queries := []string{
 		`CREATE TABLE IF NOT EXISTS projects (
-    		id SERIAL PRIMARY KEY,
+    		id INTEGER PRIMARY KEY AUTOINCREMENT,
     		name VARCHAR(255) NOT NULL,
-			updated_at TIMESTAMP NOT NULL,
+    		path VARCHAR(255) NOT NULL,
+		    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 		)`,
 	}

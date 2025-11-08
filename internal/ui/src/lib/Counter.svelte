@@ -5,6 +5,4 @@
   }
 </script>
 
-<button onclick={increment}>
-  count is {count}
-</button>
+Hello!

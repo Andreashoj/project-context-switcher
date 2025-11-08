@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"project-context-switcher/cmd"
 	"project-context-switcher/internal/db"
+	"project-context-switcher/internal/handlers"
+	"project-context-switcher/internal/repos"
+	"project-context-switcher/internal/services"
 
 	"github.com/go-chi/chi"
 )
@@ -19,7 +22,18 @@ func main() {
 
 	r := chi.NewRouter()
 
-	rootCmd := cmd.NewRootCmd(DB, r)
+	// repos
+	projectRepo := repos.NewProjectRepo(DB)
+
+	// services
+	projectService := services.NewProjectService(projectRepo)
+
+	// handler
+	projectHandler := handlers.NewProjectHandler(projectService)
+
+	handlers.RegisterProjectRoutes(r, projectHandler)
+
+	rootCmd := cmd.NewRootCmd(DB, r, projectRepo)
 	rootCmd.Init()
 
 	// Create some CRUD for creating projects?
