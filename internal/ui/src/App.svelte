@@ -1,16 +1,19 @@
 <script lang="ts">
-    let projects = $state([])
-    async function getProjects() {
-        const res = await fetch("http://localhost:8080/api/projects", {
-            method: "GET"
-        })
+    import {getProjects} from "./api/project";
 
-        if (res.ok) {
-            projects = await res.json()
+    let projects: any = $state([])
+    async function loadProjects() {
+        try {
+            projects = await getProjects()
+        } catch(e) {
+            console.log(e)
         }
     }
 
     getProjects()
 </script>
 
-{ projects }
+{#each projects as project (project)}
+    { project.name }
+{/each}
+

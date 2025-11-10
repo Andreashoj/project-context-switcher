@@ -9,8 +9,9 @@ import (
 type ProjectRepo interface {
 	Create(name string, path string) (*models.Project, error)
 	Delete(id uint) error
-	Update(name string, path string) (*models.Project, error)
+	Update(id uint, name string, path string) (*models.Project, error)
 	GetAll() ([]models.Project, error)
+	Get(id uint) (*models.Project, error)
 }
 
 type projectRepo struct {
@@ -43,6 +44,18 @@ func (p projectRepo) GetAll() ([]models.Project, error) {
 	return projects, nil
 }
 
+func (p projectRepo) Get(id uint) (*models.Project, error) {
+	var project models.Project
+	err := p.DB.QueryRow(`SELECT id, name, path, updated_at, created_at FROM projects WHERE id = $1`, id).
+		Scan(&project.Id, &project.Name, &project.Path, &project.UpdatedAt, &project.CreatedAt)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed retrieving project: %w", err)
+	}
+
+	return &project, nil
+}
+
 func (p projectRepo) Create(name string, path string) (*models.Project, error) {
 	var project models.Project
 	err := p.DB.
@@ -56,11 +69,22 @@ func (p projectRepo) Create(name string, path string) (*models.Project, error) {
 }
 
 func (p projectRepo) Delete(id uint) error {
-	//TODO implement me
-	panic("implement me")
+	if _, err := p.DB.Exec(`DELETE FROM projects WHERE id = $1`, id); err != nil {
+		return fmt.Errorf("failed deleting project: %d with error: %w", id, err)
+	}
+
+	return nil
 }
 
-func (p projectRepo) Update(name string, path string) (*models.Project, error) {
-	//TODO implement me
-	panic("implement me")
+func (p projectRepo) Update(id uint, name string, path string) (*models.Project, error) {
+	var project models.Project
+	err := p.DB.QueryRow(
+		`UPDATE projects SET name = $1, path = $2 WHERE id = $3 RETURNING id, name, path, updated_at, created_at`, id, name, path).
+		Scan(&project.Id, &project.Name, &project.UpdatedAt, &project.CreatedAt)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed retrieving project: %w", err)
+	}
+
+	return &project, nil
 }

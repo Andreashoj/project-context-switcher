@@ -39,6 +39,10 @@ func runMigrations(db *sql.DB) error {
 		    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 		)`,
+		`CREATE TRIGGER IF NOT EXISTS projects_updated_at AFTER UPDATE ON projects 
+		BEGIN 
+			UPDATE projects SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+		END`,
 	}
 
 	for _, query := range queries {

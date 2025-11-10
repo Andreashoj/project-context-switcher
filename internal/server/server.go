@@ -21,16 +21,6 @@ func RunWebServer(r *chi.Mux) error {
 		Handler: r,
 	}
 
-	staticFiles := http.FileServer(http.Dir("internal/ui/dist"))
-	r.Handle("/*", http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		directoryPath := strings.Contains(filepath.Base(request.URL.Path), ".")
-		if directoryPath {
-			staticFiles.ServeHTTP(writer, request)
-		} else {
-			http.ServeFile(writer, request, "internal/ui/dist/index.html")
-		}
-	}))
-
 	go func() {
 		fmt.Printf("Started dashboard on http://localhost:8080")
 		if err := srv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
@@ -50,4 +40,16 @@ func RunWebServer(r *chi.Mux) error {
 	}
 
 	return nil
+}
+
+func RegisterWebServerRoute(r *chi.Mux) {
+	staticFiles := http.FileServer(http.Dir("internal/ui/dist"))
+	r.Handle("/*", http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		directoryPath := strings.Contains(filepath.Base(request.URL.Path), ".")
+		if directoryPath {
+			staticFiles.ServeHTTP(writer, request)
+		} else {
+			http.ServeFile(writer, request, "internal/ui/dist/index.html")
+		}
+	}))
 }
