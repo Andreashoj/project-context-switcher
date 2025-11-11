@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"project-context-switcher/cmd"
 	"project-context-switcher/internal/db"
 	"project-context-switcher/internal/handlers"
@@ -29,17 +30,18 @@ func main() {
 
 	// services
 	projectService := services.NewProjectService(projectRepo)
-	_, err = projectService.GetContainers("")
-	if err != nil {
-		fmt.Printf("failed getting containers: %s", err)
-		return
-	}
 
 	// handler
 	projectHandler := handlers.NewProjectHandler(projectService)
 	handlers.RegisterProjectRoutes(r, projectHandler)
 
 	server.RegisterWebServerRoute(r)
+
+	// Put this into dev mode
+	if err = server.RunWebServer(r); err != nil {
+		log.Printf("failed starting the web server: %s", err)
+		return
+	}
 
 	rootCmd := cmd.NewRootCmd(DB, r, projectRepo)
 	rootCmd.Init()
